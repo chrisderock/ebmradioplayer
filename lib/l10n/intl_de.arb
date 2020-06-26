@@ -1,0 +1,12 @@
+{
+  "enterYourName": "Bitte Deinen Namen eingeben",
+  "enterASong": "Bitte einen Song eingeben",
+  "enterArtist": "Bitte eine Band eingeben",
+  "makeAWish": "Schick uns einen Wunsch",
+  "yourName": "Dein Name:",
+  "songName": "Dein Wunschsong:",
+  "artist": "Band:",
+  "greetings": "Grüße an:",
+  "send": "Senden",
+  "wishSent": "Wunsch verschickt"
+}

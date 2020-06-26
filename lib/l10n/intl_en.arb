@@ -1,0 +1,12 @@
+{
+  "enterYourName": "Please enter your name",
+  "enterASong": "Please enter a song",
+  "enterArtist": "Please enter a artist",
+  "makeAWish": "Make a wish",
+  "yourName": "Your name:",
+  "songName": "Songname:",
+  "artist": "Artist:",
+  "greetings": "Greetings:",
+  "send": "Send",
+  "wishSent": "Wish sent"
+}
