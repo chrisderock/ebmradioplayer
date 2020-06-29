@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "enterYourName" : MessageLookupByLibrary.simpleMessage("Veuillez saisir un nom"),
     "greetings" : MessageLookupByLibrary.simpleMessage("Salutations:"),
     "makeAWish" : MessageLookupByLibrary.simpleMessage("Faire un vœu"),
+    "ourWebsite" : MessageLookupByLibrary.simpleMessage("visitez notre site Internet"),
     "send" : MessageLookupByLibrary.simpleMessage("Envoyer"),
     "songName" : MessageLookupByLibrary.simpleMessage("titre de la chanson:"),
     "wishSent" : MessageLookupByLibrary.simpleMessage("souhait envoyé"),

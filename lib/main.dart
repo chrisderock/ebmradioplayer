@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
   _wishFormStatus() async {
     String ret = await HttpUtils.getForString(widget._whishStatusUri);
     setState(() {
-      // widget._wishes.value = (ret == "1" ? true : false);
+      widget._wishes.value = (ret == "1" ? true : false);
     });
   }
 
@@ -165,8 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
       content: Text(S.current.wishSent),
     ));
   }
-  _visitNews() async {
-    const url = "https://ebm-radio.de";
+  _visitWeb(String url) async {
     if(await canLaunch(url)){
       await launch(url);
     }
@@ -365,12 +364,69 @@ class _MyHomePageState extends State<MyHomePage> {
                                 shape: Border.all(
                                     width: 2.0, color: Colors.green),
                                 onPressed: () {
-                                  _visitNews();
+                                  _visitWeb("https://ebm-radio.de");
                                 },
                                 child: Text(
-                                    "Visit our Website",
+                                    S.current.ourWebsite,
                                   style: TextStyle(color: Colors.green),
                                 ),
+                              ),
+                              Spacer(),
+                              Row(
+                                children: [
+                                  Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: RaisedButton(
+                                      color: Colors.black,
+                                      child: Image(
+                                        image: AssetImage("assets/facebook.png"),
+                                      ),
+                                      onPressed: (){
+                                        _visitWeb("https://www.facebook.com/groups/ebm.radio/");
+                                      },
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: RaisedButton(
+                                      color: Colors.black,
+                                      child: Image(
+                                        image: AssetImage("assets/flickr.png"),
+                                      ),
+                                      onPressed: (){
+                                        _visitWeb("https://www.flickr.com/photos/154224693@N07/");
+                                      },
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: RaisedButton(
+                                      color: Colors.black,
+                                      child: Image(
+                                        image: AssetImage("assets/instagram.png"),
+                                      ),
+                                      onPressed: (){
+                                        _visitWeb("https://www.instagram.com/ebm_radio/");
+                                      },
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: RaisedButton(
+                                      color: Colors.black,
+                                      child: Image(
+                                        image: AssetImage("assets/twitter.png"),
+                                      ),
+                                      onPressed: (){
+                                        _visitWeb("https://twitter.com/ebm_radio");
+                                      },
+                                    ),
+                                  )
+                                ],
                               )
                             ],
                           ),
