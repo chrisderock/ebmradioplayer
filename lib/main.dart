@@ -85,7 +85,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     /// get the current stream configuration and set the matching url
-    widget._type.value = STREAM_TYPE.values[widget._localStorage.getItem("type")];
+    var type = widget._localStorage.getItem("type");
+    if(type == null)
+      type = "0";
+    widget._type.value = STREAM_TYPE.values[int.parse(type)];
     switch(widget._type.value) {
       case STREAM_TYPE.AAC:
         print("AAC");
@@ -305,8 +308,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         enabled: false,
                         style: TextStyle(color: Colors.green),
                         textAlign: TextAlign.center,
-                        maxLines: 3,
-                        minLines: 3,
+                        maxLines: 1,
+                        minLines: 1,
                       ),
                     )
                   ],
