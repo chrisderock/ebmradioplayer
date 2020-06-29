@@ -142,6 +142,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Choose Stream`
+  String get configStream {
+    return Intl.message(
+      'Choose Stream',
+      name: 'configStream',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

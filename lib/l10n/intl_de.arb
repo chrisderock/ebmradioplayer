@@ -9,5 +9,6 @@
   "greetings": "Grüße an:",
   "send": "Senden",
   "wishSent": "Wunsch verschickt",
-  "ourWebsite": "Mehr auf unserer Website"
+  "ourWebsite": "Mehr auf unserer Website",
+  "configStream": "Stream wählen"
 }

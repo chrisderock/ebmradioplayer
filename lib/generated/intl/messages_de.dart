@@ -22,6 +22,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "artist" : MessageLookupByLibrary.simpleMessage("Band:"),
+    "configStream" : MessageLookupByLibrary.simpleMessage("Stream wählen"),
     "enterASong" : MessageLookupByLibrary.simpleMessage("Bitte einen Song eingeben"),
     "enterArtist" : MessageLookupByLibrary.simpleMessage("Bitte eine Band eingeben"),
     "enterYourName" : MessageLookupByLibrary.simpleMessage("Bitte Deinen Namen eingeben"),

@@ -30,7 +30,7 @@ dependencies:
   intl: ^0.16.1
   webfeed: ^0.4.2
   url_launcher: ^5.4.11
-
+  localstorage: ^3.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

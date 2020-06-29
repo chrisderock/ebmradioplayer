@@ -7,6 +7,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:localstorage/localstorage.dart';
+
+enum STREAM_TYPE {
+  AAC,
+  MP3192,
+  MP3320,
+  UNKNOWN
+}
 
 void main() {
   runApp(MyApp());
@@ -37,7 +45,8 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
   final TextEditingController _current = TextEditingController();
-  final String _url = "http://ebm-radio.org:7000/";
+  // final String _url = "http://ebm-radio.org:7000/";
+  final ValueNotifier<String> _streamUrl = ValueNotifier("http://ebm-radio.org:8000");
   final String _whishStatusUri =
       "https://www.ebm-radio.de/scripts/wunschform_status/status.php";
   final String _wishSendUrl =
@@ -49,16 +58,35 @@ class MyHomePage extends StatefulWidget {
   final TextEditingController _song = TextEditingController();
   final TextEditingController _artist = TextEditingController();
   final TextEditingController _greetings = TextEditingController();
+  final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
+  final LocalStorage _localStorage = LocalStorage("ebmradioplayer");
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   AudioPlayer _player;
   List<String> _newsItems = List();
   void initState() {
     super.initState();
-
+    widget._type.value = STREAM_TYPE.values[widget._localStorage.getItem("type")];
+    switch(widget._type.value) {
+      case STREAM_TYPE.AAC:
+        print("AAC");
+        widget._streamUrl.value = "http://ebm-radio.org:8000";
+        break;
+      case STREAM_TYPE.MP3192:
+        print("192");
+        widget._streamUrl.value = "http://ebm-radio.org:7000";
+        break;
+      case STREAM_TYPE.MP3320:
+        print("320");
+        widget._streamUrl.value = "http://ebm-radio.org:7000/hq";
+        break;
+      default:
+        widget._streamUrl.value = "http://ebm-radio.org:8000";
+    }
     AudioPlayer.setIosCategory(IosCategory.playback);
     _player = AudioPlayer();
     Stream<IcyMetadata> s = _player.icyMetadataStream;
@@ -105,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_player.playbackState == AudioPlaybackState.playing) {
       await _player.stop();
     } else {
-      await _player.setUrl(widget._url).catchError((err) {
+      await _player.setUrl(widget._streamUrl.value).catchError((err) {
         widget._current.text = err.toString();
       });
       await _player.play();
@@ -170,6 +198,35 @@ class _MyHomePageState extends State<MyHomePage> {
       await launch(url);
     }
   }
+  _configure(BuildContext ctx) async {
+    var stream = await showDialog(
+        context: ctx,
+      builder: (BuildContext context){
+          return _ConfigDialog(
+            type: widget._type,
+          );
+      }
+    );
+    switch(stream){
+      case STREAM_TYPE.AAC:
+        print("AAC");
+        widget._streamUrl.value = "http://ebm-radio.org:8000";
+        widget._localStorage.setItem("type", 0);
+        break;
+      case STREAM_TYPE.MP3192:
+        print("192");
+        widget._streamUrl.value = "http://ebm-radio.org:7000";
+        widget._localStorage.setItem("type", 1);
+        break;
+      case STREAM_TYPE.MP3320:
+        print("320");
+        widget._streamUrl.value = "http://ebm-radio.org:7000/hq";
+        widget._localStorage.setItem("type", 2);
+        break;
+      default:
+        print("No Changes");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     Locale _l = Localizations.localeOf(context);
@@ -185,6 +242,23 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.black,
+          actions: [
+            PopupMenuButton(
+              onSelected: (res){
+                print("on select");
+                _configure(context);
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                const PopupMenuItem(
+                  value: 1,
+                    child: Text(
+                      "Configure",
+                      style: TextStyle(color: Colors.green),
+                    )
+                )
+              ],
+            ),
+          ],
         ),
         body: SingleChildScrollView(
 
@@ -439,5 +513,63 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ));
+  }
+}
+
+class _ConfigDialog extends StatefulWidget {
+  _ConfigDialog({this.type});
+  _ConfigDialogState createState() => _ConfigDialogState();
+  final ValueNotifier<STREAM_TYPE> type;
+}
+
+class _ConfigDialogState extends State<_ConfigDialog>{
+  Widget build(BuildContext context){
+    return SimpleDialog(
+      title: Text(S.current.configStream),
+      children: [
+        ListTile(
+          title: const Text("AAC 8k"),
+          leading: Radio(
+            value: STREAM_TYPE.AAC,
+            groupValue: widget.type.value,
+            onChanged: (val){
+              setState(() {
+                widget.type.value = val;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("MP3 192k"),
+          leading: Radio(
+            value: STREAM_TYPE.MP3192,
+            groupValue: widget.type.value,
+            onChanged: (val){
+              setState(() {
+                widget.type.value = val;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("MP3 320k"),
+          leading: Radio(
+            value: STREAM_TYPE.MP3320,
+            groupValue: widget.type.value,
+            onChanged: (val){
+              setState(() {
+                widget.type.value = val;
+              });
+            },
+          ),
+        ),
+        SimpleDialogOption(
+          child: const Text("OK"),
+          onPressed: (){
+            Navigator.pop(context, widget.type.value);
+          },
+        )
+      ],
+    );
   }
 }

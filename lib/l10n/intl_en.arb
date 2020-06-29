@@ -9,5 +9,6 @@
   "greetings": "Greetings:",
   "send": "Send",
   "wishSent": "Wish sent",
-  "ourWebsite": "Visit our Website"
+  "ourWebsite": "Visit our Website",
+  "configStream": "Choose Stream"
 }
