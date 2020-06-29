@@ -467,10 +467,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: RaisedButton(
                                       color: Colors.black,
                                       child: Image(
-                                        image: AssetImage("assets/flickr.png"),
+                                        image: AssetImage("assets/telegram.png"),
                                       ),
                                       onPressed: (){
-                                        _visitWeb("https://www.flickr.com/photos/154224693@N07/");
+                                        _visitWeb("https://t.me/ebm_radio");
                                       },
                                     ),
                                   ),
