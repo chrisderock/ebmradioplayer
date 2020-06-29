@@ -162,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ));
       return;
     }
-    /*
+
     String uri = widget._wishSendUrl + '?interpret='
         + widget._artist.text + '&song='
         + widget._song.text + '&name='
@@ -170,9 +170,8 @@ class _MyHomePageState extends State<MyHomePage> {
         + widget._greetings.text;
     String send = Uri.encodeFull(uri);
     print(send);
-     */
-    // var resp = await HttpUtils.getForString(send);
-    String bdy = 'name=' +
+    var resp = await HttpUtils.getForString(send);
+    /* String bdy = 'name=' +
         Uri.encodeComponent(widget._name.text) +
         '&interpret=' +
         Uri.encodeComponent(widget._artist.text) +
@@ -183,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(bdy);
     Map<String, String> hdr = Map();
     hdr['Content-Type'] = 'application/x-www-form-urlencoded';
-    var resp = await HttpUtils.postForString(widget._wishSendUrl, body: bdy);
+    var resp = await HttpUtils.postForString(widget._wishSendUrl, body: bdy);*/
     print(resp);
     widget._song.clear();
     widget._artist.clear();
