@@ -44,32 +44,47 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
+  /// holds the current streamed title
   final TextEditingController _current = TextEditingController();
-  // final String _url = "http://ebm-radio.org:7000/";
+  /// the current stream-url
   final ValueNotifier<String> _streamUrl = ValueNotifier("http://ebm-radio.org:8000");
+  /// the url to check the status for the whishform
   final String _whishStatusUri =
       "https://www.ebm-radio.de/scripts/wunschform_status/status.php";
   final String _wishSendUrl =
+  /// the url to post a whish
       "https://www.ebm-radio.de/scripts/wunschform_status/wish.php";
+  /// the url of the newsfeed
   final String _feedUrl = 'https://ebm-radio.de/index.php?format=feed&type=rss';
+  /// is the stream running or not?
   final ValueNotifier<bool> _running = ValueNotifier(false);
+  /// is the whishform active or not?
   final ValueNotifier<bool> _wishes = ValueNotifier(false);
+  /// holds the name of the user for the whishform
   final TextEditingController _name = TextEditingController();
+  /// holds the songtitle for the whishform
   final TextEditingController _song = TextEditingController();
+  /// the band/artist for the whishform
   final TextEditingController _artist = TextEditingController();
+  /// greetings from the whishform
   final TextEditingController _greetings = TextEditingController();
+  /// the configuration for the stream url
   final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
+  /// for storing the stream type
   final LocalStorage _localStorage = LocalStorage("ebmradioplayer");
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
+  /// the player itself
   AudioPlayer _player;
+  /// the newsitems
   List<String> _newsItems = List();
+  /// init the player page
   void initState() {
     super.initState();
+    /// get the current stream configuration and set the matching url
     widget._type.value = STREAM_TYPE.values[widget._localStorage.getItem("type")];
     switch(widget._type.value) {
       case STREAM_TYPE.AAC:
@@ -87,6 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
       default:
         widget._streamUrl.value = "http://ebm-radio.org:8000";
     }
+    /// init the player
     AudioPlayer.setIosCategory(IosCategory.playback);
     _player = AudioPlayer();
     Stream<IcyMetadata> s = _player.icyMetadataStream;
@@ -97,16 +113,18 @@ class _MyHomePageState extends State<MyHomePage> {
         widget._current.text = event.info.title;
       });
     });
+    /// check periodic for the status of the whishform
     Timer.periodic(Duration(minutes: 5, seconds: 0), (timer) {
       print("Timer run");
       _wishFormStatus();
     });
+    /// check periodic for news
     Timer.periodic(Duration(hours: 1), (timer) {
       _feed();
     });
     _feed();
   }
-
+  /// load the current newsfeed and display them
   _feed() async {
     var feed = await HttpUtils.getForString(widget._feedUrl);
     var rss = RssFeed.parse(feed);
@@ -121,14 +139,14 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
   }
-
+  /// check the state of the whishform
   _wishFormStatus() async {
     String ret = await HttpUtils.getForString(widget._whishStatusUri);
     setState(() {
       widget._wishes.value = (ret == "1" ? true : false);
     });
   }
-
+  /// start and stop the player
   _playPause() async {
     if (_player.playbackState == AudioPlaybackState.playing) {
       await _player.stop();
@@ -139,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await _player.play();
     }
   }
-
+  /// send a whish
   _sendWish(BuildContext ctx) async {
     if (widget._name.text.isEmpty) {
       Scaffold.of(ctx).showSnackBar(SnackBar(
@@ -162,7 +180,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ));
       return;
     }
-
     String uri = widget._wishSendUrl + '?interpret='
         + widget._artist.text + '&song='
         + widget._song.text + '&name='
@@ -192,11 +209,13 @@ class _MyHomePageState extends State<MyHomePage> {
       content: Text(S.current.wishSent),
     ));
   }
+  /// visit a url via browser
   _visitWeb(String url) async {
     if(await canLaunch(url)){
       await launch(url);
     }
   }
+  /// show the config dialog and configure the stream source
   _configure(BuildContext ctx) async {
     var stream = await showDialog(
         context: ctx,
@@ -226,6 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
         print("No Changes");
     }
   }
+  /// show the user interface
   @override
   Widget build(BuildContext context) {
     Locale _l = Localizations.localeOf(context);
@@ -241,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.black,
-          actions: [
+          actions: [ /// the configuration menu
             PopupMenuButton(
               onSelected: (res){
                 print("on select");
@@ -260,11 +280,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         body: SingleChildScrollView(
-
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                /// the top view that dosnt change
                 Text(
                   'Strange music for strange people',
                   style: TextStyle(
@@ -329,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                //Spacer(),
+                /// the whishform
                 Builder(
                   builder: (BuildContext context) {
                     return Column(children: [
@@ -410,6 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           )
                       ),
+                      /// the newsfeed
                       Visibility(
                         visible: !widget._wishes.value,
                         child: SizedBox(
@@ -445,6 +466,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               Spacer(),
+                              /// social buttons
                               Row(
                                 children: [
                                   Flexible(
@@ -514,7 +536,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 }
-
+/// the configuration dialog
 class _ConfigDialog extends StatefulWidget {
   _ConfigDialog({this.type});
   _ConfigDialogState createState() => _ConfigDialogState();
