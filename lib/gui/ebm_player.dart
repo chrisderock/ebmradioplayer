@@ -6,7 +6,9 @@ import 'package:just_audio/just_audio.dart';
 import 'dart:async';
 
 class EbmPlayer extends StatefulWidget {
+  EbmPlayer({this.latest});
   _EbmPlayer createState() => _EbmPlayer();
+  final List<String> latest;
   final TextEditingController _currentSong = TextEditingController();
   final ValueNotifier<bool> _playing = ValueNotifier(true);
 }
@@ -20,13 +22,20 @@ class _EbmPlayer extends State<EbmPlayer>{
         androidNotificationColor: 0xFF5cb12d,
         androidNotificationIcon: 'mipmap/ic_stat_ebm_radio_bw',
         androidEnableQueue: false,
+        androidStopForegroundOnPause: true
         // androidArtDownscaleSize: Size.square(100.0)
     );
     AudioService.currentMediaItemStream.listen((event) {
-      setState(() {
-        if(event != null && event.title != null)
+      if(event != null && event.title != null && event.title != widget._currentSong.text)
+        setState(() {
           widget._currentSong.text = event.title;
-      });
+          if(widget.latest.indexOf(event.title) < 0) {
+            if (widget.latest.length == 10) {
+              widget.latest.removeLast();
+            }
+            widget.latest.insert(0, event.title);
+          }
+        });
     });
     AudioService.playbackStateStream.listen((event) {
       if(event.playing != widget._playing.value)
@@ -35,8 +44,16 @@ class _EbmPlayer extends State<EbmPlayer>{
         });
     });
   }
+  void dispose(){
+    stopAll();
+    super.dispose();
+  }
+  stopAll() async {
+    await AudioService.stop();
+  }
   start() => AudioService.play();
-  stop() => AudioService.pause();
+  pause() => AudioService.pause();
+  stop() => AudioService.stop();
   Widget build(BuildContext context){
     return AudioServiceWidget(
         child: Container(
@@ -63,7 +80,7 @@ class _EbmPlayer extends State<EbmPlayer>{
                 visible: widget._playing.value,
                 child: RaisedButton(
                   child: Text("Pause"),
-                  onPressed: stop,
+                  onPressed: pause,
                 ),
               ),
               Visibility(

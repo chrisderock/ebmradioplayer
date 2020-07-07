@@ -1,3 +1,4 @@
+import 'package:ebmradioplayer/gui/ebm_latest.dart';
 import 'package:ebmradioplayer/gui/ebm_news.dart';
 import 'package:ebmradioplayer/gui/ebm_player.dart';
 import 'package:ebmradioplayer/gui/ebm_social.dart';
@@ -95,6 +96,7 @@ class MyHomePage extends StatefulWidget {
       "https://www.ebm-radio.de/scripts/wunschform_status/wish.php";
   final String _feedUrl = 'https://ebm-radio.de/index.php?format=feed&type=rss';
   final String _homeUrl = "https://ebm-radio.de";
+  final List<String> _latest = List<String>();
   /// the configuration for the stream url
   // final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
   /// for storing the stream type
@@ -126,6 +128,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       EbmSocial(
 
+      ),
+      EbmLatest(
+        latest: widget._latest,
       )
     ];
   }
@@ -140,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
           centerTitle: true,
-          actions: [ /// the configuration menu
+          /*actions: [ /// the configuration menu
             PopupMenuButton(
               onSelected: (res){
               },
@@ -154,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
             ),
-          ],
+          ],*/
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -162,6 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 EbmPlayer(
+                  latest: widget._latest,
                   //streamType: widget._type,
                 ),
                 Container(
@@ -173,8 +179,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
+        // fixedColor: Colors.black,
+        // selectedItemColor: Colors.black,
         items: [
           BottomNavigationBarItem(
+            backgroundColor: Colors.black,
             title: Text("News",
               style: TextStyle(color: Colors.green),
             ),
@@ -208,6 +217,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               activeIcon: Icon(
                 Icons.public,
+                color: Colors.lightGreen,
+              )
+          ),
+          BottomNavigationBarItem(
+              title: Text("Latest Tracks",
+                style: TextStyle(color: Colors.green),
+              ),
+              icon: Icon(Icons.format_list_bulleted,
+                color: Colors.green,
+              ),
+              activeIcon: Icon(
+                Icons.format_list_bulleted,
                 color: Colors.lightGreen,
               )
           ),

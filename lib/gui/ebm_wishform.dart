@@ -1,3 +1,4 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ebmradioplayer/generated/l10n.dart';
 
@@ -23,7 +24,7 @@ class _EbmWishform extends State<EbmWishform>{
         '&gruesse=' + widget._greetingsController.text
     );
     print(qry);
-    String resp = "";// await HttpUtils.getForString(qry);
+    String resp = await HttpUtils.getForString(qry);
     Scaffold.of(ctx).showSnackBar(SnackBar(
       content: Text(
         resp == "1" ? S.current.wishSent : S.current.wishError
