@@ -31,6 +31,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ourWebsite" : MessageLookupByLibrary.simpleMessage("visitez notre site Internet"),
     "send" : MessageLookupByLibrary.simpleMessage("Envoyer"),
     "songName" : MessageLookupByLibrary.simpleMessage("titre de la chanson:"),
+    "wishError" : MessageLookupByLibrary.simpleMessage("erreur d\'envoi"),
     "wishSent" : MessageLookupByLibrary.simpleMessage("souhait envoyé"),
     "yourName" : MessageLookupByLibrary.simpleMessage("Votre nom:")
   };

@@ -152,6 +152,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Error on sending`
+  String get wishError {
+    return Intl.message(
+      'Error on sending',
+      name: 'wishError',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -10,5 +10,6 @@
   "send": "Envoyer",
   "wishSent": "souhait envoyé",
   "ourWebsite": "visitez notre site Internet",
-  "configStream": "choisit le flux"
+  "configStream": "choisit le flux",
+  "wishError": "erreur d'envoi"
 }

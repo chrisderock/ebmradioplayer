@@ -10,5 +10,6 @@
   "send": "Send",
   "wishSent": "Wish sent",
   "ourWebsite": "Visit our Website",
-  "configStream": "Choose Stream"
+  "configStream": "Choose Stream",
+  "wishError": "Error on sending"
 }
