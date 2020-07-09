@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 
 class EbmLatest extends StatefulWidget{
-  EbmLatest({this.latest});
+  EbmLatest({this.latest, this.lastChanged});
   final List<String> latest;
+  final ValueNotifier lastChanged;
   _EbmLatest createState() => _EbmLatest();
 }
 
 class _EbmLatest extends State<EbmLatest>{
+  void initState(){
+    super.initState();
+    widget.lastChanged.addListener(() {
+      setState(() {
+        print("tach");
+      });
+    });
+  }
   Widget build(BuildContext context){
     return Container(
         height: 280,

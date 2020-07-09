@@ -13,8 +13,9 @@ enum STREAM_TYPE {
 }
 
 class EbmPlayer extends StatefulWidget {
-  EbmPlayer({this.latest, this.streamType});
+  EbmPlayer({this.latest, this.streamType, this.lastChanged});
   _EbmPlayer createState() => _EbmPlayer();
+  final ValueNotifier<String> lastChanged;
   set queue(STREAM_TYPE t){
     switch(t){
       case STREAM_TYPE.MP3192:
@@ -76,6 +77,7 @@ class _EbmPlayer extends State<EbmPlayer>{
               widget.latest.removeLast();
             }
             widget.latest.insert(0, event.title);
+            widget.lastChanged.value = event.title;
           }
         });
     });

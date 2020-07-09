@@ -43,6 +43,7 @@ class MyHomePage extends StatefulWidget {
   final String _feedUrl = 'https://ebm-radio.de/index.php?format=feed&type=rss';
   final String _homeUrl = "https://ebm-radio.de";
   final List<String> _latest = List<String>();
+  final ValueNotifier<String> _latestChanged = ValueNotifier("");
   /// the configuration for the stream url
   final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
   /// for storing the stream type
@@ -80,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       EbmLatest(
         latest: widget._latest,
+        lastChanged: widget._latestChanged,
       )
     ];
   }
@@ -133,6 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 EbmPlayer(
                   latest: widget._latest,
                   streamType: widget._type,
+                  lastChanged: widget._latestChanged,
                 ),
                 Container(
                   child: _widgets.elementAt(_selectedIndex),
