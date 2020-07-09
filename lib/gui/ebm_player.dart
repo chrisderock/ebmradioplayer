@@ -5,12 +5,54 @@ import 'package:flutter/rendering.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:async';
 
+enum STREAM_TYPE {
+  AAC,
+  MP3192,
+  MP3320,
+  UNKNOWN
+}
+
 class EbmPlayer extends StatefulWidget {
-  EbmPlayer({this.latest});
+  EbmPlayer({this.latest, this.streamType});
   _EbmPlayer createState() => _EbmPlayer();
+  set queue(STREAM_TYPE t){
+    switch(t){
+      case STREAM_TYPE.MP3192:
+        AudioServiceBackground.setQueue(_mp3_192);
+        break;
+      case STREAM_TYPE.MP3320:
+        AudioServiceBackground.setQueue(_mp3_320);
+        break;
+      default:
+        AudioServiceBackground.setQueue(_aac);
+    }
+  }
   final List<String> latest;
+  final ValueNotifier<STREAM_TYPE> streamType;
   final TextEditingController _currentSong = TextEditingController();
   final ValueNotifier<bool> _playing = ValueNotifier(true);
+  final List<MediaItem> _aac = <MediaItem>[
+    MediaItem(
+        id: 'http://ebm-radio.org:8000',
+        title: '(((EBM Radio)))',
+        album: 'AAC 8K'
+    )
+  ];
+  final List<MediaItem> _mp3_192 = <MediaItem>[
+    MediaItem(
+        id: 'http://ebm-radio.org:7000',
+        title: '(((EBM Radio)))',
+        album: 'MP3 192K'
+    )
+  ];
+  final List<MediaItem> _mp3_320 = <MediaItem>[
+    MediaItem(
+        id: 'http://ebm-radio.org:7000/hq',
+        title: '(((EBM Radio)))',
+        album: 'MP3 320K'
+    )
+  ];
+
 }
 
 class _EbmPlayer extends State<EbmPlayer>{
@@ -43,6 +85,35 @@ class _EbmPlayer extends State<EbmPlayer>{
           widget._playing.value = event.playing;
         });
     });
+    /* switch(widget.streamType.value){
+      case STREAM_TYPE.MP3192:
+        AudioServiceBackground.setQueue(widget._mp3_192);
+        break;
+      case STREAM_TYPE.MP3320:
+        AudioServiceBackground.setQueue(widget._mp3_320);
+        break;
+      default:
+        AudioServiceBackground.setQueue(widget._aac);
+    }*/
+    widget.streamType.addListener(() {
+      _streamChange();
+    });
+
+  }
+  void _streamChange() async {
+    print("Stream Changed: " + widget.streamType.value.toString());
+    // await AudioService.pause();
+    switch(widget.streamType.value){
+      case STREAM_TYPE.MP3192:
+        await AudioService.updateQueue(widget._mp3_192);
+        break;
+      case STREAM_TYPE.MP3320:
+        await AudioService.updateQueue(widget._mp3_320);
+        break;
+      default:
+        await AudioService.updateQueue(widget._aac);
+    }
+    // await AudioService.play();
   }
   void dispose(){
     stopAll();
@@ -132,7 +203,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     MediaItem(
         id: 'http://ebm-radio.org:8000',
         title: '(((EBM Radio)))',
-        album: 'AAC'
+        album: '(((EBM Radio)))'
     ),
     /*MediaItem(
       id: "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3",
@@ -210,6 +281,21 @@ class AudioPlayerTask extends BackgroundAudioTask {
     onSkipToNext();
   }
 
+  @override
+  Future<void> onUpdateQueue(List<MediaItem> newQueue) async {
+    print("newQueue");
+    MediaItem item = this.mediaItem.copyWith(
+      id: newQueue[0].id,
+      album: newQueue[0].album
+    );
+    print(item.id);
+    await _audioPlayer.stop();
+    await _audioPlayer.setUrl(item.id);
+    await AudioServiceBackground.setMediaItem(item);
+    await _audioPlayer.play();
+    //_queueIndex = -1;
+    //onSkipToNext();
+  }
   void _handlePlaybackCompleted() {
     if (hasNext) {
       onSkipToNext();

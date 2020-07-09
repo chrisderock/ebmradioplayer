@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:ebmradioplayer/gui/ebm_latest.dart';
 import 'package:ebmradioplayer/gui/ebm_news.dart';
 import 'package:ebmradioplayer/gui/ebm_player.dart';
@@ -9,13 +10,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:flutter/src/foundation/change_notifier.dart';
 
-enum STREAM_TYPE {
-  AAC,
-  MP3192,
-  MP3320,
-  UNKNOWN
-}
 void main() {
   runApp(MyApp());
 }
@@ -49,9 +45,9 @@ class MyHomePage extends StatefulWidget {
   final String _homeUrl = "https://ebm-radio.de";
   final List<String> _latest = List<String>();
   /// the configuration for the stream url
-  // final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
+  final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
   /// for storing the stream type
-  // final LocalStorage _localStorage = LocalStorage("ebmradioplayer");
+  final LocalStorage _localStorage = LocalStorage("ebmradioplayer.json");
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -69,6 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
   /// init the player page
   void initState() {
     super.initState();
+    var type = widget._localStorage.getItem("type");
+    print(type);
+    widget._type.value = type == null ? STREAM_TYPE.AAC : STREAM_TYPE.values[type];
     _widgets = <Widget>[
       EbmNews(
         newsFeed: widget._feedUrl,
@@ -85,6 +84,20 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     ];
   }
+  _configure(BuildContext context) async {
+    STREAM_TYPE stream = await showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return _ConfigDialog(type: widget._type,);
+      }
+    );
+    //setState(() {
+      print(widget._type.value);
+      await widget._localStorage.setItem("type", stream.toString());
+      widget._type.value = stream;
+      widget._type.notifyListeners();
+    // });
+  }
   /// show the user interface
   @override
   Widget build(BuildContext context) {
@@ -96,9 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
           centerTitle: true,
-          /*actions: [ /// the configuration menu
+          actions: [ /// the configuration menu
             PopupMenuButton(
               onSelected: (res){
+                _configure(context);
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                 const PopupMenuItem(
@@ -110,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               ],
             ),
-          ],*/
+          ],
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -119,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 EbmPlayer(
                   latest: widget._latest,
-                  //streamType: widget._type,
+                  streamType: widget._type,
                 ),
                 Container(
                   child: _widgets.elementAt(_selectedIndex),
@@ -195,9 +209,14 @@ class _ConfigDialog extends StatefulWidget {
   _ConfigDialog({this.type});
   _ConfigDialogState createState() => _ConfigDialogState();
   final ValueNotifier<STREAM_TYPE> type;
+  final ValueNotifier<STREAM_TYPE> _newType = ValueNotifier(STREAM_TYPE.UNKNOWN);
 }
 
 class _ConfigDialogState extends State<_ConfigDialog>{
+  void initState(){
+    super.initState();
+    widget._newType.value = widget.type.value;
+  }
   Widget build(BuildContext context){
     return SimpleDialog(
       title: Text(S.current.configStream),
@@ -206,10 +225,10 @@ class _ConfigDialogState extends State<_ConfigDialog>{
           title: const Text("AAC 8k"),
           leading: Radio(
             value: STREAM_TYPE.AAC,
-            groupValue: widget.type.value,
+            groupValue: widget._newType.value,
             onChanged: (val){
               setState(() {
-                widget.type.value = val;
+                widget._newType.value = val;
               });
             },
           ),
@@ -218,10 +237,10 @@ class _ConfigDialogState extends State<_ConfigDialog>{
           title: const Text("MP3 192k"),
           leading: Radio(
             value: STREAM_TYPE.MP3192,
-            groupValue: widget.type.value,
+            groupValue: widget._newType.value,
             onChanged: (val){
               setState(() {
-                widget.type.value = val;
+                widget._newType.value = val;
               });
             },
           ),
@@ -230,10 +249,10 @@ class _ConfigDialogState extends State<_ConfigDialog>{
           title: const Text("MP3 320k"),
           leading: Radio(
             value: STREAM_TYPE.MP3320,
-            groupValue: widget.type.value,
+            groupValue: widget._newType.value,
             onChanged: (val){
               setState(() {
-                widget.type.value = val;
+                widget._newType.value = val;
               });
             },
           ),
@@ -241,7 +260,7 @@ class _ConfigDialogState extends State<_ConfigDialog>{
         SimpleDialogOption(
           child: const Text("OK"),
           onPressed: (){
-            Navigator.pop(context, widget.type.value);
+            Navigator.pop(context, widget._newType.value);
           },
         )
       ],
