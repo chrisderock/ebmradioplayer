@@ -2,12 +2,13 @@ import 'package:ebmradioplayer/gui/ebm_latest.dart';
 import 'package:ebmradioplayer/gui/ebm_news.dart';
 import 'package:ebmradioplayer/gui/ebm_player.dart';
 import 'package:ebmradioplayer/gui/ebm_social.dart';
+import 'package:ebmradioplayer/gui/ebm_theme.dart';
 import 'package:ebmradioplayer/gui/ebm_wishform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
-//import 'package:localstorage/localstorage.dart';
+import 'package:localstorage/localstorage.dart';
 
 enum STREAM_TYPE {
   AAC,
@@ -32,57 +33,7 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: S.delegate.supportedLocales,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        accentColor: Colors.green,
-        scaffoldBackgroundColor: Colors.black,
-        appBarTheme: AppBarTheme(
-          color: Colors.black,
-          textTheme: TextTheme(
-              bodyText1: TextStyle(color: Colors.green),
-              bodyText2: TextStyle(color: Colors.green),
-              button: TextStyle(color: Colors.green),
-              subtitle1: TextStyle(color: Colors.green),
-              subtitle2: TextStyle(color: Colors.green),
-            headline1: TextStyle(color: Colors.green),
-            headline2: TextStyle(color: Colors.green),
-            headline3: TextStyle(color: Colors.green),
-            headline4: TextStyle(color: Colors.green),
-            headline5: TextStyle(color: Colors.green),
-            headline6: TextStyle(color: Colors.green, fontSize: 20.0),
-            caption: TextStyle(color: Colors.green),
-          ),
-          actionsIconTheme: IconThemeData(
-            color: Colors.green
-          )
-        ),
-        primaryTextTheme: TextTheme(
-          bodyText1: TextStyle(color: Colors.green),
-          bodyText2: TextStyle(color: Colors.green),
-          button: TextStyle(color: Colors.green),
-          subtitle1: TextStyle(color: Colors.green),
-          subtitle2: TextStyle(color: Colors.green)
-        ),
-        textTheme: TextTheme(
-          bodyText1: TextStyle(color: Colors.green),
-          bodyText2: TextStyle(color: Colors.green),
-          button: TextStyle(color: Colors.green),
-            subtitle1: TextStyle(color: Colors.green),
-            subtitle2: TextStyle(color: Colors.green)
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          hintStyle: TextStyle(color: Colors.green),
-        ),
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.black,
-          textTheme: ButtonTextTheme.accent,
-          shape: Border.all(
-            width: 2.0,
-            color: Colors.green
-          )
-        )
-      ),
+      theme: getEbmTheme(),
       // home: MyHomePage(title: '(((EBM Radio)))'),
       home: MyHomePage(title: '(((EBM Radio)))',),
     );
