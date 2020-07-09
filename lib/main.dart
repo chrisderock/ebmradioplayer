@@ -1,4 +1,3 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:ebmradioplayer/gui/ebm_latest.dart';
 import 'package:ebmradioplayer/gui/ebm_news.dart';
 import 'package:ebmradioplayer/gui/ebm_player.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:flutter/src/foundation/change_notifier.dart';
+// import 'package:flutter/src/foundation/change_notifier.dart';
 
 void main() {
   runApp(MyApp());
@@ -91,12 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
         return _ConfigDialog(type: widget._type,);
       }
     );
-    //setState(() {
+    setState(() {
       print(widget._type.value);
-      await widget._localStorage.setItem("type", stream.toString());
+      widget._localStorage.setItem("type", stream.toString());
       widget._type.value = stream;
-      widget._type.notifyListeners();
-    // });
+      // widget._type.notifyListeners();
+    });
   }
   /// show the user interface
   @override
