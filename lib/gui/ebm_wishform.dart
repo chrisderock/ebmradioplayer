@@ -18,6 +18,10 @@ class EbmWishform extends StatefulWidget {
 }
 
 class _EbmWishform extends State<EbmWishform>{
+  void initState(){
+    super.initState();
+    _readData();
+  }
   _readData() async{
     widget._nameController.text = await widget.storage.read(key: "name");
   }
