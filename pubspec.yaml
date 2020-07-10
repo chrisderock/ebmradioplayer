@@ -25,7 +25,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  just_audio: ^0.2.1
+  just_audio: ^0.2.2
+  #just_audio2: ^0.1.1
   basic_utils: ^2.5.5
   intl: ^0.16.1
   webfeed: ^0.4.2

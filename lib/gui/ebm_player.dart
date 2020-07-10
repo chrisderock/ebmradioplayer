@@ -84,6 +84,7 @@ class _EbmPlayer extends State<EbmPlayer>{
         // androidArtDownscaleSize: Size.square(100.0)
     );
     AudioService.currentMediaItemStream.listen((event) {
+      print(event);
       if(event != null && event.title != null && event.title != widget._currentSong.text)
         setState(() {
           widget._currentSong.text = event.title;
@@ -316,6 +317,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
     );
     print(item.id);
     await _audioPlayer.stop();
+    Map<String,String> m = Map();
+    m["Icy-Meta"]="1";
     await _audioPlayer.setUrl(item.id);
     await AudioServiceBackground.setMediaItem(item);
     await _audioPlayer.play();
@@ -359,6 +362,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
     _skipState = offset > 0
         ? AudioProcessingState.skippingToNext
         : AudioProcessingState.skippingToPrevious;
+    Map<String,String> m = Map();
+    m["Icy-Meta"] = "1";
     await _audioPlayer.setUrl(mediaItem.id);
     _skipState = null;
     // Resume playback if we were playing
