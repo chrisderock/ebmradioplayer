@@ -8,9 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
-import 'package:localstorage/localstorage.dart';
-// import 'package:flutter/src/foundation/change_notifier.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 void main() {
   runApp(MyApp());
 }
@@ -47,7 +45,7 @@ class MyHomePage extends StatefulWidget {
   /// the configuration for the stream url
   final ValueNotifier<STREAM_TYPE> _type = ValueNotifier(STREAM_TYPE.UNKNOWN);
   /// for storing the stream type
-  final LocalStorage _localStorage = LocalStorage("ebmradioplayer.json");
+  final FlutterSecureStorage _localStorage = new FlutterSecureStorage();
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -62,12 +60,15 @@ class _MyHomePageState extends State<MyHomePage> {
       _selectedIndex = index;
     });
   }
+  void _readData() async{
+    var type = await widget._localStorage.read(key: "type");
+    print(type);
+    widget._type.value = type == null ? STREAM_TYPE.AAC : STREAM_TYPE.values.firstWhere((element) => element.toString() == type);
+  }
   /// init the player page
   void initState() {
     super.initState();
-    var type = widget._localStorage.getItem("type");
-    print(type);
-    widget._type.value = type == null ? STREAM_TYPE.AAC : STREAM_TYPE.values[type];
+    _readData();
     _widgets = <Widget>[
       EbmNews(
         newsFeed: widget._feedUrl,
@@ -75,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       EbmWishform(
         sendUrl: widget._wishSendUrl,
+        storage: widget._localStorage,
       ),
       EbmSocial(
 
@@ -94,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     setState(() {
       print(widget._type.value);
-      widget._localStorage.setItem("type", stream.toString());
+      widget._localStorage.write(key: "type", value: stream.toString());
       widget._type.value = stream;
       // widget._type.notifyListeners();
     });
