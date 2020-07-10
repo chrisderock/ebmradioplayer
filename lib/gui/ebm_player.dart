@@ -9,6 +9,8 @@ enum STREAM_TYPE {
   AAC,
   MP3192,
   MP3320,
+  OGG_LOW,
+  OGG_HIGH,
   UNKNOWN
 }
 
@@ -53,7 +55,20 @@ class EbmPlayer extends StatefulWidget {
         album: 'MP3 320K'
     )
   ];
-
+  final List<MediaItem> _ogg_low = <MediaItem>[
+    MediaItem(
+        id: 'http://ebm-radio.org:9000/ebm.ogg',
+        title: '(((EBM Radio)))',
+        album: 'MP3 320K'
+    )
+  ];
+  final List<MediaItem> _ogg_high = <MediaItem>[
+    MediaItem(
+        id: 'http://ebm-radio.org:9000/ebm_high.ogg',
+        title: '(((EBM Radio)))',
+        album: 'MP3 320K'
+    )
+  ];
 }
 
 class _EbmPlayer extends State<EbmPlayer>{
@@ -111,6 +126,12 @@ class _EbmPlayer extends State<EbmPlayer>{
         break;
       case STREAM_TYPE.MP3320:
         await AudioService.updateQueue(widget._mp3_320);
+        break;
+      case STREAM_TYPE.OGG_LOW:
+        await AudioService.updateQueue(widget._ogg_low);
+        break;
+      case STREAM_TYPE.OGG_HIGH:
+        await AudioService.updateQueue(widget._ogg_high);
         break;
       default:
         await AudioService.updateQueue(widget._aac);

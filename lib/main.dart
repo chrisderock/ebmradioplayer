@@ -261,6 +261,30 @@ class _ConfigDialogState extends State<_ConfigDialog>{
             },
           ),
         ),
+        ListTile(
+          title: const Text("OGG Low"),
+          leading: Radio(
+            value: STREAM_TYPE.OGG_LOW,
+            groupValue: widget._newType.value,
+            onChanged: (val){
+              setState(() {
+                widget._newType.value = val;
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text("Ogg High"),
+          leading: Radio(
+            value: STREAM_TYPE.OGG_HIGH,
+            groupValue: widget._newType.value,
+            onChanged: (val){
+              setState(() {
+                widget._newType.value = val;
+              });
+            },
+          ),
+        ),
         SimpleDialogOption(
           child: const Text("OK"),
           onPressed: (){
