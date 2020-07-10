@@ -264,14 +264,17 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   void onStart(Map<String, dynamic> params) {
+    AudioPlayer.setIosCategory(IosCategory.playback);
     _playerStateSubscription = _audioPlayer.playbackStateStream
         .where((state) => state == AudioPlaybackState.completed)
         .listen((state) {
       _handlePlaybackCompleted();
     });
     _audioPlayer.icyMetadataStream.listen((event) {
-      MediaItem current = this.mediaItem.copyWith(title: event.info.title);
-      AudioServiceBackground.setMediaItem(current);
+      if(event != null) {
+        MediaItem current = this.mediaItem.copyWith(title: event.info.title);
+        AudioServiceBackground.setMediaItem(current);
+      }
     });
     _eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
       final bufferingState =
