@@ -1,6 +1,5 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 class EbmLatest extends StatefulWidget{
   EbmLatest({this.latest, this.lastChanged});

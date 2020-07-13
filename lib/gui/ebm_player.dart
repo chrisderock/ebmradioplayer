@@ -155,24 +155,6 @@ class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
     });
 
   }
-  _loadLatestFromBackground() async {
-    print("loadLatestFromBackground");
-    await AudioService.connect();
-    List<dynamic> lts = await AudioService.customAction("getLatest");
-    if(lts != null){
-      setState(() {
-        widget.latest.clear();
-        lts.reversed.forEach((element) {
-          widget.latest.insert(0, element.toString());
-          // widget.latest.add(element.toString());
-          print("adding: " + element.toString());
-        });
-
-        widget.lastChanged.value = lts[0].toString();
-        widget.lastChanged.notifyListeners();
-      });
-    }
-  }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state){
     print("didChangeAppLifecycleState");
