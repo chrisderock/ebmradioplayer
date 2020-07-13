@@ -29,6 +29,12 @@ class EbmPlayer extends StatefulWidget {
       case STREAM_TYPE.MP3320:
         AudioServiceBackground.setQueue(_mp3_320);
         break;
+      case STREAM_TYPE.OGG_LOW:
+        AudioServiceBackground.setQueue(_ogg_low);
+        break;
+      case STREAM_TYPE.OGG_HIGH:
+        AudioServiceBackground.setQueue(_ogg_high);
+        break;
       default:
         AudioServiceBackground.setQueue(_aac);
     }
@@ -74,7 +80,7 @@ class EbmPlayer extends StatefulWidget {
   ];
 }
 
-class _EbmPlayer extends State<EbmPlayer>{
+class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
   void _loadTracks() async {
     print("load tracks");
     Map<String,String> m = Map();
@@ -95,7 +101,9 @@ class _EbmPlayer extends State<EbmPlayer>{
     }
   }
   void initState(){
+    print("Player init State");
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     AudioService.start(
         backgroundTaskEntrypoint: _audioPlayerTaskEntrypoint,
         androidNotificationChannelName: '(((EBM Radio)))',
@@ -106,7 +114,7 @@ class _EbmPlayer extends State<EbmPlayer>{
         // androidArtDownscaleSize: Size.square(100.0)
     );
     AudioService.currentMediaItemStream.listen((event) {
-      print(event);
+      // print(event);
       if(event != null && event.title != null && event.title != widget._currentSong.text)
         setState(() {
           widget._currentSong.text = event.title;
@@ -146,6 +154,32 @@ class _EbmPlayer extends State<EbmPlayer>{
       //_streamChange();
     });
 
+  }
+  _loadLatestFromBackground() async {
+    print("loadLatestFromBackground");
+    await AudioService.connect();
+    List<dynamic> lts = await AudioService.customAction("getLatest");
+    if(lts != null){
+      setState(() {
+        widget.latest.clear();
+        lts.reversed.forEach((element) {
+          widget.latest.insert(0, element.toString());
+          // widget.latest.add(element.toString());
+          print("adding: " + element.toString());
+        });
+
+        widget.lastChanged.value = lts[0].toString();
+        widget.lastChanged.notifyListeners();
+      });
+    }
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    print("didChangeAppLifecycleState");
+    print(state);
+    if(state == AppLifecycleState.resumed){
+      AudioService.connect();
+    }
   }
   void _streamChange() async {
     print("Stream Changed: " + widget.streamType.value.toString());
@@ -258,24 +292,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
         title: '(((EBM Radio)))',
         album: '(((EBM Radio)))'
     ),
-    /*MediaItem(
-      id: "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3",
-      album: "Science Friday",
-      title: "A Salute To Head-Scratching Science",
-      artist: "Science Friday and WNYC Studios",
-      duration: Duration(milliseconds: 5739820),
-      artUri:
-      "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
-    ),
-    MediaItem(
-      id: "https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3",
-      album: "Science Friday",
-      title: "From Cat Rheology To Operatic Incompetence",
-      artist: "Science Friday and WNYC Studios",
-      duration: Duration(milliseconds: 2856950),
-      artUri:
-      "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
-    ),*/
   ];
   int _queueIndex = -1;
   AudioPlayer _audioPlayer = new AudioPlayer();
@@ -292,6 +308,15 @@ class AudioPlayerTask extends BackgroundAudioTask {
   StreamSubscription<AudioPlaybackState> _playerStateSubscription;
   StreamSubscription<AudioPlaybackEvent> _eventSubscription;
 
+  final List<String> _latestTracks = List<String>();
+
+  @override
+  Future<dynamic> onCustomAction(String name, dynamic arguments){
+    if(name == "getLatest"){
+      return Future.value(_latestTracks);
+    }
+    return null;
+  }
   @override
   void onStart(Map<String, dynamic> params) {
     AudioPlayer.setIosCategory(IosCategory.playback);
@@ -301,9 +326,16 @@ class AudioPlayerTask extends BackgroundAudioTask {
       _handlePlaybackCompleted();
     });
     _audioPlayer.icyMetadataStream.listen((event) {
-      if(event != null) {
+      if(event != null && event.info != null && event.info.title != null && event.info.title != "") {
         MediaItem current = this.mediaItem.copyWith(title: event.info.title);
         AudioServiceBackground.setMediaItem(current);
+        if(_latestTracks.length == 0 || _latestTracks[0] != event.info.title) {
+          print("BG-Info" + event.info.title);
+          if (_latestTracks.length == 10) {
+            _latestTracks.removeLast();
+          }
+          _latestTracks.insert(0, event.info.title);
+        }
       }
     });
     _eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
