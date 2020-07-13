@@ -81,25 +81,6 @@ class EbmPlayer extends StatefulWidget {
 }
 
 class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
-  void _loadTracks() async {
-    print("load tracks");
-    Map<String,String> m = Map();
-    m["sid"]="1";
-    String str = await HttpUtils.getForString("http://ebm-radio.org:7000/stats",headers: m);
-    XmlDocument doc = parse(str);
-    Iterable<XmlElement> elem = doc.findAllElements("SONGTITLE");
-    XmlElement e1 = elem.first;
-    print(e1.firstChild);
-    print(Platform.operatingSystem);
-    if(e1.firstChild.text != null && e1.firstChild.text != widget._currentSong.text){
-      setState(() {
-        widget._currentSong.text = e1.firstChild.text;
-        if(widget.latest.length == 10) widget.latest.removeLast();
-        widget.latest.insert(0, e1.firstChild.text);
-        widget.lastChanged.value = e1.firstChild.text;
-      });
-    }
-  }
   void initState(){
     print("Player init State");
     super.initState();
@@ -111,10 +92,9 @@ class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
         androidNotificationIcon: 'mipmap/ic_stat_ebm_radio_bw',
         androidEnableQueue: false,
         androidStopForegroundOnPause: true
-        // androidArtDownscaleSize: Size.square(100.0)
     );
     AudioService.currentMediaItemStream.listen((event) {
-      // print(event);
+      print(event);
       if(event != null && event.title != null && event.title != widget._currentSong.text)
         setState(() {
           widget._currentSong.text = event.title;
@@ -133,23 +113,6 @@ class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
           widget._playing.value = event.playing;
         });
     });
-    if(Platform.isIOS){
-      _loadTracks();
-      Timer.periodic(Duration(seconds: 10), (timer) {
-        print("timer run");
-        _loadTracks();
-      });
-    }
-    /* switch(widget.streamType.value){
-      case STREAM_TYPE.MP3192:
-        AudioServiceBackground.setQueue(widget._mp3_192);
-        break;
-      case STREAM_TYPE.MP3320:
-        AudioServiceBackground.setQueue(widget._mp3_320);
-        break;
-      default:
-        AudioServiceBackground.setQueue(widget._aac);
-    }*/
     widget.streamType.addListener(() {
       //_streamChange();
     });
@@ -165,7 +128,6 @@ class _EbmPlayer extends State<EbmPlayer> with WidgetsBindingObserver{
   }
   void _streamChange() async {
     print("Stream Changed: " + widget.streamType.value.toString());
-    // await AudioService.pause();
     switch(widget.streamType.value){
       case STREAM_TYPE.MP3192:
         await AudioService.updateQueue(widget._mp3_192);
@@ -291,6 +253,26 @@ class AudioPlayerTask extends BackgroundAudioTask {
   StreamSubscription<AudioPlaybackEvent> _eventSubscription;
 
   final List<String> _latestTracks = List<String>();
+  void _loadTracks() async {
+    print("load tracks");
+    Map<String,String> m = Map();
+    m["sid"]="1";
+    String str = await HttpUtils.getForString("http://ebm-radio.org:7000/stats",headers: m);
+    XmlDocument doc = parse(str);
+    Iterable<XmlElement> elem = doc.findAllElements("SONGTITLE");
+    XmlElement e1 = elem.first;
+    // print(e1.firstChild);
+    // print(Platform.operatingSystem);
+    if(e1.firstChild.text != null && (_latestTracks.length == 0 || e1.firstChild.text != _latestTracks[0])){
+      if(_latestTracks.length == 10){
+        _latestTracks.removeLast();
+      }
+      _latestTracks.insert(0, e1.firstChild.text);
+      MediaItem current = this.mediaItem.copyWith(title: e1.firstChild.text);
+      AudioServiceBackground.setMediaItem(current);
+      print("SetItem");
+    }
+  }
 
   @override
   Future<dynamic> onCustomAction(String name, dynamic arguments){
@@ -349,6 +331,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
     AudioServiceBackground.setQueue(_queue);
     onSkipToNext();
+    if(Platform.isIOS){
+      _loadTracks();
+      Timer.periodic(Duration(seconds: 10), (timer) {
+        print("timer run");
+        _loadTracks();
+      });
+    }
+
   }
 
   @override
