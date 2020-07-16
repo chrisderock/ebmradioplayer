@@ -166,7 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ),
           BottomNavigationBarItem(
-            title: Text("Wishes",
+              backgroundColor: Colors.black,
+              title: Text("Wishes",
               style: TextStyle(color: Colors.green),
             ),
             icon: Icon(Icons.question_answer,
@@ -178,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ),
           BottomNavigationBarItem(
+              backgroundColor: Colors.black,
               title: Text("Social",
                 style: TextStyle(color: Colors.green),
               ),
@@ -190,6 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
               )
           ),
           BottomNavigationBarItem(
+              backgroundColor: Colors.black,
               title: Text("Latest Tracks",
                 style: TextStyle(color: Colors.green),
               ),
