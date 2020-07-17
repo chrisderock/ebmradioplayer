@@ -2,6 +2,10 @@
 
 Player for (((EBM Radio))) - Strange music for strange people
 
+## Addroid
+The android app is available on the PlayStore
+https://play.google.com/store/apps/details?id=de.ebmradio.ebmradioplayer
+
 ## Streaming
 The app plays the radio stream from (((EBM Radio))) located at
 http://ebm-radio.org in format AAC or MP3 (configurable). If there is a live
