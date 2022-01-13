@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate
       ],
       supportedLocales: S.delegate.supportedLocales,
-      title: 'Flutter Demo',
+      title: '(((EBM Radio)))',
       theme: getEbmTheme(),
       // home: MyHomePage(title: '(((EBM Radio)))'),
       home: MyHomePage(title: '(((EBM Radio)))',),
